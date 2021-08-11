@@ -10,90 +10,78 @@ using System.Web.Mvc;
 namespace ElevenNote.WebMVC.Controllers
 {
     [Authorize]
-    public class NoteController : Controller
+    public class CategoryController : Controller
     {
-        // GET: Note
+        // GET: Category
         public ActionResult Index()
         {
             var userId = Guid.Parse(User.Identity.GetUserId());
-            var service = new NoteService(userId);
-            var model = service.GetNotes();
+            var service = new CategoryService(userId);
+            var model = service.GetCategory();
             return View(model);
         }
-
-        // GET: Note/Details/5
-        public ActionResult Details(int id)
-        {
-            var svc = CreateNoteService();
-            var model = svc.GetNoteById(id);
-            return View(model);
-        }
-
-        // GET: Note/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Note/Create
+        //Get
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(NoteCreate model)
+        public ActionResult Create(CategoryCreate model)
         {
             if (!ModelState.IsValid) return View(model);
+            var service = CreateCategoryService();
 
-            var service = CreateNoteService();
-            if (service.CreateNote(model))
+            if (service.CreateCategory(model))
             {
-                TempData["SaveResult"] = "Your note was created.";
+                TempData["SaveResult"] = "Your category was created.";
                 return RedirectToAction("Index");
             };
             ModelState.AddModelError("", "Note could not be created.");
             return View(model);
         }
-
-        private NoteService CreateNoteService()
+        private CategoryService CreateCategoryService()
         {
             var userId = Guid.Parse(User.Identity.GetUserId());
-            var service = new NoteService(userId);
+            var service = new CategoryService(userId);
             return service;
         }
-
-        // GET: Note/Edit/5
+        // GET: Category/Details/5
+        public ActionResult Details(int id)
+        {
+            var svc = CreateCategoryService();
+            var model = svc.GetCategoryById(id);
+            return View(model);
+        }
+        // GET: Category/Edit/5
         public ActionResult Edit(int id)
         {
-            var service = CreateNoteService();
-            var detail = service.GetNoteById(id);
+            var service = CreateCategoryService();
+            var detail = service.GetCategoryById(id);
             var model =
-                new NoteEdit
+                new CategoryEdit
                 {
-                    NoteId = detail.NoteId,
-                    Title = detail.Title,
-                    Content = detail.Content
+                    CategoryID = detail.CategoryID,
+                    Name = detail.Name,
                 };
             return View(model);
         }
-
-        // POST: Note/Edit/5
+        // POST: Category/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, NoteEdit model)
+        public ActionResult Edit(int id, CategoryEdit model)
         {
             try
             {
                 if (!ModelState.IsValid) return View(model);
-                if (model.NoteId != id)
+                if (model.CategoryID != id)
                 {
                     ModelState.AddModelError("", "id Mismatch");
                     return View(model);
                 }
 
-                var service = CreateNoteService();
-                if (service.UpdateNote(model))
+                var service = CreateCategoryService();
+                if (service.UpdateCategory(model))
                 {
-                    TempData["SaveResult"] = "Your note was Updated.";
+                    TempData["SaveResult"] = "Your Category was Updated.";
                     return RedirectToAction("Index");
                 }
-                ModelState.AddModelError("", "Your note could not be updated");
+                ModelState.AddModelError("", "Your Category could not be updated");
                 return View(model);
             }
             catch
@@ -102,12 +90,12 @@ namespace ElevenNote.WebMVC.Controllers
             }
         }
 
-        // GET: Note/Delete/5
+        // GET: Category/Delete/5
         [ActionName("Delete")]
         public ActionResult Delete(int id)
         {
-            var service = CreateNoteService();
-            var model = service.GetNoteById(id);
+            var service = CreateCategoryService();
+            var model = service.GetCategoryById(id);
             return View(model);
         }
 
@@ -117,16 +105,12 @@ namespace ElevenNote.WebMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeletePost(int id)
         {
-
-
             // TODO: Add delete logic here
-            var service = CreateNoteService();
-            service.DeleteNote(id);
-            TempData["SaveResult"] = "Your note was deleted";
+            var service = CreateCategoryService();
+            service.DeleteCategory(id);
+            TempData["SaveResult"] = "Your category was deleted";
 
             return RedirectToAction("Index");
-
-
         }
     }
 }
